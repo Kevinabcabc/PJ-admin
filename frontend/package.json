@@ -1,0 +1,25 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "npx webpack",
+    "dev": "npx webpack-dev-server"
+  },
+  "devDependencies": {
+    "clean-webpack-plugin": "^4.0.0-alpha.0",
+    "copy-webpack-plugin": "6.4.1",
+    "css-loader": "^5.2.1",
+    "html-webpack-plugin": "4.5.1",
+    "style-loader": "^2.0.0",
+    "webpack": "4.44.2",
+    "webpack-cli": "3.3.12",
+    "webpack-dev-server": "^3.11.2"
+  },
+  "dependencies": {
+    "art-template": "^4.13.2",
+    "art-template-loader": "^1.4.3",
+    "sme-router": "^0.12.8"
+  }
+}
