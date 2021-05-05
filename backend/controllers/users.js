@@ -1,5 +1,5 @@
 const usersModel = require('../models/users');
-const {hash, compare} = require('../utils/tools');
+const {hash, compare, sign, verify} = require('../utils/tools');
 const  randomstring = require('randomstring');
 
 // 退出登录
@@ -29,9 +29,13 @@ const signin = async (req, res, next) => {
 
       // // Set-Cookie http 协议种cookie字段
       // res.set('Set-Cookie', `sessionId=${sessionId}; Path=/; HttpOnly`);
-      req.session.username = username;
+      // req.session.username = username;
 
       // console.log(2, req.session.username);
+      const token = sign(username);
+      // console.log(1111, token);
+      // 自定义首部字段以x开头
+      res.set('X-Access-Token', token);
       res.send({
         code: 200,
         errorMsg: 'ok',
@@ -97,12 +101,12 @@ const remove = async (req, res, next) => {
   res.set('Content-Type', 'application/json;charset=utf-8');
   if (result) {
     res.send({
-      code: 0
+      code: 200
     });
     res.end();
   } else {
     res.send({
-      code: -1
+      code: 400
     });
     res.end();
   }
@@ -110,12 +114,21 @@ const remove = async (req, res, next) => {
 }
 
 const isAuth = async (req, res, next) => {
-  if (req.session.username) {
-    res.send({
-      code: 200,
-      msg: 'ok',
-    });
-  } else {
+  const token = req.get('X-Access-Token');
+  try {
+    let result = verify(token);
+    if (result.username) {
+      res.send({
+        code: 200,
+        msg: result.username,
+      });
+    } else {
+      res.send({
+        code: 404,
+        errorMsg: '登录过期或没有登录',
+      });
+    }
+  } catch (error) {
     res.send({
       code: 404,
       errorMsg: '登录过期或没有登录',

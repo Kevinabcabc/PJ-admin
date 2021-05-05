@@ -20,8 +20,11 @@ const _handleSubmit = (router) => {
       url: '/api/users/signin',
       type: 'post',
       data,
-      success: (res) => {
-        console.log(222, res);
+      success: (res, text, jhr) => {
+        if (!window.global_setting) {
+          window.global_setting = {}
+        }
+        localStorage.setItem('token', jhr.getResponseHeader('X-Access-Token'))
         router.go('/index');
       }
     })
@@ -79,6 +82,9 @@ const _loadData = () => {
     url: '/api/users',
     dataType: "json",
     async: false,
+    headers: {
+      "X-Access-Token": localStorage.getItem('token') || '',
+    },
     success(result) {
       dataList = result;
       let start = (currentPage-1)*pagesize;
@@ -102,6 +108,9 @@ const _handleUserSave = (e) => {
     url: '/api/users',
     type: 'post',
     data: formData,
+    headers: {
+      "X-Access-Token": localStorage.getItem('token') || '',
+    },
     success: (res) => {
       // console.log('signup', res);
       _loadData();
@@ -136,6 +145,9 @@ const index = (router) => {
         data: {
           id: $(this).data('id'),
         },
+        headers: {
+          "X-Access-Token": localStorage.getItem('token') || '',
+        },
         success(res) {
           // console.log(res);
           _loadData();
@@ -144,15 +156,17 @@ const index = (router) => {
     });
 
     $('#users-signout').on('click', (e) => {
-      e.preventDefault()
-      $.ajax({
-        url: '/api/users/signout',
-        dataType: 'json',
-        success: (res) => {
-          router.go('/signin');
-          // location.reload()
-        }
-      });
+      // e.preventDefault()
+      // $.ajax({
+      //   url: '/api/users/signout',
+      //   dataType: 'json',
+      //   success: (res) => {
+      //     router.go('/signin');
+      //     // location.reload()
+      //   }
+      // });
+      localStorage.setItem('token', '');
+      location.reload();
     });
     // render list
     _loadData();
