@@ -1,6 +1,59 @@
 const usersModel = require('../models/users');
-const {hash} = require('../utils/tools');
+const {hash, compare} = require('../utils/tools');
+const  randomstring = require('randomstring');
 
+// 退出登录
+
+const signout = async (req, res, next) => {
+  req.session = null;
+  res.send({
+    code: 200,
+    msg: '退出成功',
+  })
+}
+
+// 登录
+const signin = async (req, res, next) => {
+  const {username, password} = req.body;
+  res.set('Content-Type', 'application/json;charset=utf-8');
+
+  let result = await usersModel.findUser({username});
+
+  // 验证用户是否是合法用户
+  if (result) {
+    let {password: hash} = result;
+    let compareRes = await compare(password, hash);
+    if (compareRes) {
+      // const sessionId = randomstring.generate();
+      // console.log(1, sessionId);
+
+      // // Set-Cookie http 协议种cookie字段
+      // res.set('Set-Cookie', `sessionId=${sessionId}; Path=/; HttpOnly`);
+      req.session.username = username;
+
+      // console.log(2, req.session.username);
+      res.send({
+        code: 200,
+        errorMsg: 'ok',
+      });
+      res.end();
+    } else {
+      res.send({
+        code: 404,
+        errorMsg: '用户名或密码错误',
+      });
+      res.end();
+    }
+  } else {
+    res.send({
+      code: 404,
+      errorMsg: '用户名或密码错误',
+    });
+    res.end();
+  }
+}
+
+// 注册用户
 const signup = async (req, res, next) => {
   const {username, password} = req.body;
   //  密码加密
@@ -56,6 +109,23 @@ const remove = async (req, res, next) => {
 
 }
 
+const isAuth = async (req, res, next) => {
+  if (req.session.username) {
+    res.send({
+      code: 200,
+      msg: 'ok',
+    });
+  } else {
+    res.send({
+      code: 404,
+      errorMsg: '登录过期或没有登录',
+    });
+  }
+}
+
 exports.signup = signup;
+exports.signout = signout;
+exports.signin = signin;
 exports.list = list;
 exports.remove = remove;
+exports.isAuth = isAuth;

@@ -15,9 +15,29 @@ let dataList = [];
 
 const _handleSubmit = (router) => {
   return (e) => {
-    console.log('sign in', e);
-    router.go('/index');
+    const data = $('#singIn').serialize();
+    $.ajax({
+      url: '/api/users/signin',
+      type: 'post',
+      data,
+      success: (res) => {
+        console.log(222, res);
+        router.go('/index');
+      }
+    })
   }
+}
+
+const _signup = () => {
+  const data = $('#users-form').serialize();
+  $.ajax({
+    api: '/api/users',
+    type: 'post',
+    data,
+    success: (res) => {
+
+    }
+  })
 }
 
 
@@ -125,7 +145,14 @@ const index = (router) => {
 
     $('#users-signout').on('click', (e) => {
       e.preventDefault()
-      router.go('/signin');
+      $.ajax({
+        url: '/api/users/signout',
+        dataType: 'json',
+        success: (res) => {
+          router.go('/signin');
+          // location.reload()
+        }
+      });
     });
     // render list
     _loadData();

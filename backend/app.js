@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var cookieSession = require("cookie-session");
 
 var userRouter = require('./routes/users');
 var cors =require('cors')
@@ -20,6 +21,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 // app.use(cors());
+
+app.use(cookieSession({
+  name: 'session',
+  keys: [
+    'key1', 'key2'
+  ]
+}))
 
 app.use('/api/users', userRouter);
 

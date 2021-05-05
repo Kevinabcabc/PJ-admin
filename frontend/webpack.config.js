@@ -25,6 +25,7 @@ module.exports = {
       {
         test: /\.css$/,
         exclude: /(node_modules)/,
+        // 从后往前解析
         loaders: ['style-loader', 'css-loader']
       }
     ]
